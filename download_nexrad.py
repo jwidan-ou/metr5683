@@ -2,11 +2,13 @@ from pathlib import Path
 import datetime as dt
 import re
 import os
+import numpy as np
 import urllib.request
 
 import s3fs
 import pandas as pd
 
+### CONFIG ###
 NEXRAD_BUCKET = "unidata-nexrad-level2"
 NEXRAD_HTTP_ROOT = f"https://{NEXRAD_BUCKET}.s3.amazonaws.com"
 # Allow 4-character alphanumeric IDs (e.g., KTLX, NOP4, DAN1)
@@ -17,11 +19,17 @@ RADAR_SITE_ALIASES = {
 }
 
 def _expand_radar_sites(site):
+    """
+    Expand a radar site ID to include all known aliases.
+    """
     site = str(site).upper()
     aliases = RADAR_SITE_ALIASES.get(site, [site])
     return list(dict.fromkeys(aliases))
 
 def _parse_nexrad_key_time(key):
+    """
+    Extract the scan time from a NEXRAD S3 key.
+    """
     name = Path(key).name
     match = NEXRAD_KEY_RE.search(name)
     if not match:
@@ -29,6 +37,9 @@ def _parse_nexrad_key_time(key):
     return dt.datetime.strptime(f"{match.group(2)}{match.group(3)}", "%Y%m%d%H%M%S")
 
 def _s3_to_https_url(s3_path):
+    """
+    Convert an S3 path to an HTTPS URL for direct download.
+    """
     if s3_path.startswith("s3://"):
         path = s3_path[len("s3://"):]
     else:
@@ -41,6 +52,9 @@ def _s3_to_https_url(s3_path):
     return f"{NEXRAD_HTTP_ROOT}/{key}"
 
 def _list_nexrad_keys_s3fs(aws, prefix):
+    """
+    List NEXRAD keys in S3 under the given prefix using s3fs.
+    """
     s3_dir = f"{NEXRAD_BUCKET}/{prefix}"
     try:
         items = aws.ls(s3_dir, refresh=True)
@@ -61,9 +75,31 @@ def _list_nexrad_keys_s3fs(aws, prefix):
     return keys
 
 def _download_nexrad_file(url, out_file):
+    """
+    Download a NEXRAD file from the given URL to the specified output file path.
+    """
     with urllib.request.urlopen(url) as response:
         with open(out_file, "wb") as out_f:
             out_f.write(response.read())
+
+def haversine_km(lat1, lon1, lat2, lon2):
+    """
+    Calculate the distance in kilometers between two points
+    specified in decimal degrees using the Haversine formula."""
+
+    lat1 = np.radians(np.asarray(lat1, dtype=float))
+    lon1 = np.radians(np.asarray(lon1, dtype=float))
+    lat2 = np.radians(np.asarray(lat2, dtype=float))
+
+    lon2 = np.radians(np.asarray(lon2, dtype=float))
+    dlat = lat2 - lat1
+    dlon = lon2 - lon1
+
+    # Apply formula
+    a = np.sin(dlat / 2.0) ** 2 + np.cos(lat1) * np.cos(lat2) * np.sin(dlon / 2.0) ** 2
+    c = 2.0 * np.arcsin(np.sqrt(a))
+    rad = 6371.0 # Earth radius in kilometers
+    return rad * c
 
 def build_time_windows_from_masked_counts(
     filtered_counts,
@@ -71,6 +107,13 @@ def build_time_windows_from_masked_counts(
     selected_dates=None,
     time_col="time",
 ):
+    """
+    Build time windows for NEXRAD downloads based on filtered hail report counts and DDA region reports.
+    Parameters:
+        filtered_counts: DataFrame with daily hail report counts (indexed by date)
+        dda_region_reports: DataFrame with hail reports in the DDA region (must include time_col)
+        selected_dates: Optional list of specific dates to include (if None, use all dates in filtered_counts)
+        time_col: Name of the column in dda_region_reports that contains the report timestamps"""
     reports = dda_region_reports.copy()
     reports[time_col] = pd.to_datetime(reports[time_col], errors="coerce")
     reports = reports.dropna(subset=[time_col]).copy()
