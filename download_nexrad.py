@@ -102,8 +102,8 @@ def haversine_km(lat1, lon1, lat2, lon2):
     return rad * c
 
 def build_time_windows_from_masked_counts(
-    filtered_counts,
-    dda_region_reports,
+    region_reports,
+    filtered_counts=None,
     selected_dates=None,
     time_col="time",
 ):
@@ -111,12 +111,15 @@ def build_time_windows_from_masked_counts(
     Build time windows for NEXRAD downloads based on filtered hail report counts and DDA region reports.
     Parameters:
         filtered_counts: DataFrame with daily hail report counts (indexed by date)
-        dda_region_reports: DataFrame with hail reports in the DDA region (must include time_col)
+        region_reports: DataFrame with hail reports in the specified region (must include time_col)
         selected_dates: Optional list of specific dates to include (if None, use all dates in filtered_counts)
-        time_col: Name of the column in dda_region_reports that contains the report timestamps"""
-    reports = dda_region_reports.copy()
+        time_col: Name of the column in region_reports that contains the report timestamps
+    Returns:
+        DataFrame with columns: date, start_utc, end_utc, n_reports
+    """
+    reports = region_reports.copy()
     reports[time_col] = pd.to_datetime(reports[time_col], errors="coerce")
-    reports = reports.dropna(subset=[time_col]).copy()
+    reports = reports.dropna(subset=[time_col])
 
     if selected_dates is None:
         dates = pd.to_datetime(filtered_counts.index).date
@@ -224,16 +227,16 @@ def download_nexrad_from_aws_windows(
     return pd.DataFrame(records).sort_values("scan_time_utc").reset_index(drop=True)
 
 def download_nexrad_from_filtered_counts(
-    filtered_counts,
-    dda_region_reports,
+    region_reports,
     selected_dates,
     radar_sites,
     out_dir,
+    filtered_counts=None,
     **download_kwargs,
 ):
     windows = build_time_windows_from_masked_counts(
         filtered_counts=filtered_counts,
-        dda_region_reports=dda_region_reports,
+        region_reports=region_reports,
         selected_dates=selected_dates,
     )
     manifest = download_nexrad_from_aws_windows(
