@@ -256,7 +256,7 @@ def get_dict():
             'cmap': mcolors.ListedColormap(['white', 'gold', 'red', 'black']),
             'cbar_label': r'HSDA classes',
             'cbar_ticks': [0, 1, 2, 3],
-            'cbar_tick_labels': ['No Hail', 'Small Hail', 'Large Hail', 'Giant Hail'],
+            'cbar_tick_labels': ['No Hail', 'Small Hail\n(<25 mm)', 'Large Hail\n(25-50 mm)', 'Giant Hail\n(>50 mm)'],
             'title': r'Hail Size Discrimination Algorithm (HSDA)'
         },
         'mesh_75_mh19': {
