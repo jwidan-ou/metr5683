@@ -212,7 +212,8 @@ def get_dict():
             'vmax': 70,
             'cmap': "ChaseSpectral",
             'cbar_label': r'$Z_H$ (dBZ)',
-            'title': r'Reflectivity ($Z_H$)'
+            'title': r'Reflectivity ($Z_H$)',
+            'units': 'dBZ'
         },
         'v': {
             'vmin': v_lim[0],
@@ -220,21 +221,24 @@ def get_dict():
             'cmap': v_cmap,
             'levels': v_levels,
             'cbar_label': r'$V$ (m s$^{-1}$)',
-            'title': r'Base Velocity ($V$)'
+            'title': r'Base Velocity ($V$)',
+            'units': r'm s$^{-1}$'
         },
         'rho': {
             'vmin': rho_hv()[1][0],
             'vmax': rho_hv()[1][1],
             'cmap': rho_hv()[0],
             'cbar_label': r'$\rho_{HV}$',
-            'title': r'Correlation Coefficient ($\rho_{HV}$)'
+            'title': r'Correlation Coefficient ($\rho_{HV}$)',
+            'units': ''
         },
         'zdr': {
             'vmin': zdr()[1][0],
             'vmax': zdr()[1][1],
             'cmap': zdr()[0],
             'cbar_label': r'$Z_{DR}$ (dB)',
-            'title': r'Differential Reflectivity ($Z_{DR}$)'
+            'title': r'Differential Reflectivity ($Z_{DR}$)',
+            'units': 'dB'
         },
         'kdp': {
             'vmin': kdp()[1][0],
@@ -242,13 +246,15 @@ def get_dict():
             'cmap': kdp()[0],
             'cbar_label': r'$K_{DP}$ (°/km)',
             'title': r'Specific Differential Phase ($K_{DP}$)',
+            'units': r'°/km'
         },
         'hdr_size': {
             'vmin': 0,
             'vmax': 60,
             'cmap': "inferno",
             'cbar_label': r'HDR-derived size (mm)',
-            'title': r'Hail Differential Reflectivity (HDR) Size'
+            'title': r'Hail Differential Reflectivity (HDR) Size',
+            'units': 'mm'
         },
          'hsda': {
             'vmin': -0.5,
@@ -257,14 +263,16 @@ def get_dict():
             'cbar_label': r'HSDA classes',
             'cbar_ticks': [0, 1, 2, 3],
             'cbar_tick_labels': ['No Hail', 'Small Hail\n(<25 mm)', 'Large Hail\n(25-50 mm)', 'Giant Hail\n(>50 mm)'],
-            'title': r'Hail Size Discrimination Algorithm (HSDA)'
+            'title': r'Hail Size Discrimination Algorithm (HSDA)',
+            'units': ''
         },
         'mesh_75_mh19': {
             'vmin': 0,
             'vmax': 60,
             'cmap': "inferno",
             'cbar_label': r'MESH (mm)',
-            'title': r'Maximum Estimated Size of Hail (MESH) - MH19'
+            'title': r'Maximum Estimated Size of Hail (MESH) - MH19',
+            'units': 'mm'
         },
         'hca': {
             'vmin': -0.5,
@@ -274,7 +282,8 @@ def get_dict():
             'cbar_label': r'HCA classes',
             'cbar_ticks': np.arange(10),
             'cbar_tick_labels': ["NC", "AG", "CR", "LR", "RP", "RN", "VI", "WS", "MH", "IH/HDG"],
-            'title': r'Hydrometeor Classification Algorithm (Besic et al. 2016)'
+            'title': r'Hydrometeor Classification Algorithm (Besic et al. 2016)',
+            'units': ''
         }
     }
 
