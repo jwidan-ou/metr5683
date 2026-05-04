@@ -202,6 +202,7 @@ def kdp(kdp_vmin=-2.0, kdp_vmax=7.0):
 
     return kdp_cmap, [kdp_vmin, kdp_vmax]
 
+## Dictionary with plotting info for each field
 def get_dict():
     v_cmap, v_lim, v_levels = velocity_ms()
 

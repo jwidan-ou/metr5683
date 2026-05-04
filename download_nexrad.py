@@ -8,12 +8,19 @@ import urllib.request
 import s3fs
 import pandas as pd
 
-### CONFIG ###
+##############################################
+# Title: NEXRAD Download Utilities
+# Description: Functions for downloading and processing NEXRAD radar data (AI-assisted)
+# Author: Jacob Widanski
+# Date: 12 April 2026
+##############################################
+
+### GLOBAL CONFIG ###
 NEXRAD_BUCKET = "unidata-nexrad-level2"
 NEXRAD_HTTP_ROOT = f"https://{NEXRAD_BUCKET}.s3.amazonaws.com"
 # Allow 4-character alphanumeric IDs (e.g., KTLX, NOP4, DAN1)
 NEXRAD_KEY_RE = re.compile(r"([A-Z0-9]{4})(\d{8})_(\d{6})_V\d{2}")
-
+# KCRI aliases
 RADAR_SITE_ALIASES = {
     "KCRI": ["KCRI", "NOP3", "NOP4", "ROP3", "ROP4", "FOP1", "DAN1", "DOP1"],
 }
@@ -85,8 +92,8 @@ def _download_nexrad_file(url, out_file):
 def haversine_km(lat1, lon1, lat2, lon2):
     """
     Calculate the distance in kilometers between two points
-    specified in decimal degrees using the Haversine formula."""
-
+    specified in decimal degrees using the Haversine formula.
+    """
     lat1 = np.radians(np.asarray(lat1, dtype=float))
     lon1 = np.radians(np.asarray(lon1, dtype=float))
     lat2 = np.radians(np.asarray(lat2, dtype=float))
@@ -108,9 +115,9 @@ def build_time_windows_from_masked_counts(
     time_col="time",
 ):
     """
-    Build time windows for NEXRAD downloads based on filtered hail report counts and DDA region reports.
+    Build time windows for NEXRAD downloads based on filtered hail reports and region reports.
     Parameters:
-        filtered_counts: DataFrame with daily hail report counts (indexed by date)
+        filtered_counts: DataFrame with daily hail reports (indexed by date)
         region_reports: DataFrame with hail reports in the specified region (must include time_col)
         selected_dates: Optional list of specific dates to include (if None, use all dates in filtered_counts)
         time_col: Name of the column in region_reports that contains the report timestamps
